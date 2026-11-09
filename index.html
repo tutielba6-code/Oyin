@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <title>Futbol o'yini</title>
+    <style>
+        body { margin: 0; background: #111; color: white; text-align: center; font-family: Arial; }
+        h2 { color: lime; margin-top: 10px; }
+        canvas { background: #168b39; border: 3px solid white; display: block; margin: 10px auto; max-width: 95%; touch-action: none; }
+        button { padding: 12px 24px; font-size: 18px; background: lime; border: none; font-weight: bold; border-radius: 8px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h2>Futbol O'yini</h2>
+    <canvas id="gameCanvas" width="400" height="600"></canvas>
+    <button id="shootBtn">ZARBA! (TEPISH)</button>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+
+        let ball = { x: 200, y: 500, radius: 12, speedX: 0, speedY: 0, kicked: false };
+        let gk = { x: 160, y: 120, width: 80, height: 20, speed: 3 };
+        let score = 0;
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.strokeStyle = "white";
+            ctx.lineWidth = 5;
+            ctx.strokeRect(100, 80, 200, 100);
+
+            ctx.fillStyle = "red";
+            ctx.fillRect(gk.x, gk.y, gk.width, gk.height);
+
+            ctx.fillStyle = "white";
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = "white";
+            ctx.font = "20px Arial";
+            ctx.fillText("Gollar: " + score, 20, 40);
+        }
+
+        function update() {
+            gk.x += gk.speed;
+            if (gk.x <= 100 || gk.x + gk.width >= 300) {
+                gk.speed = -gk.speed;
+            }
+
+            if (ball.kicked) {
+                ball.y += ball.speedY;
+                ball.x += ball.speedX;
+
+                if (ball.x > gk.x && ball.x < gk.x + gk.width && ball.y - ball.radius <= gk.y + gk.height && ball.y + ball.radius >= gk.y) {
+                    alert("Darvozabon qaytardi!");
+                    resetBall();
+                }
+
+                if (ball.y <= 80 && ball.x > 100 && ball.x < 300) {
+                    score++;
+                    alert("GOL! 🎉");
+                    resetBall();
+                }
+
+                if (ball.y < 0 || ball.x < 0 || ball.x > canvas.width) {
+                    resetBall();
+                }
+            }
+        }
+
+        function resetBall() {
+            ball.x = 200;
+            ball.y = 500;
+            ball.speedX = 0;
+            ball.speedY = 0;
+            ball.kicked = false;
+        }
+
+        function shoot() {
+            if (!ball.kicked) {
+                ball.kicked = true;
+                ball.speedY = -8;
+                ball.speedX = (Math.random() - 0.5) * 4;
+            }
+        }
+
+        document.getElementById("shootBtn").addEventListener("click", shoot);
+        canvas.addEventListener("click", shoot);
+
+        function loop() {
+            update();
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        loop();
+    </script>
+</body>
+  </html>
+  
